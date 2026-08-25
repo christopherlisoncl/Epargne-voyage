@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titre %}Cagnotte Voyage{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% block entete %}
+  <div class="entete">
+    <div class="marque"><span class="emoji">🌍</span> Cagnotte Voyage</div>
+    {% if session.get('role') %}
+      <a class="lien-deconnexion" href="{{ url_for('auth.logout') }}">Se déconnecter</a>
+    {% endif %}
+  </div>
+  {% endblock %}
+
+  <div class="conteneur">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for categorie, message in messages %}
+          <div class="message {{ categorie }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block contenu %}{% endblock %}
+  </div>
+
+  <footer class="pied">Épargne collective 2025–2026 · un pas à la fois ✨</footer>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titre %}Ajouter un participant{% endblock %}
+{% block contenu %}
+
+<div class="fil-ariane"><a href="{{ url_for('coach.overview') }}">← Vue d'ensemble</a></div>
+
+<div class="carte" style="max-width:480px; margin: 0 auto;">
+  <h1>Ajouter un participant</h1>
+  <form method="post">
+    <div class="champ">
+      <label for="nom">Nom du participant</label>
+      <input type="text" id="nom" name="nom" required autofocus>
+    </div>
+    <div class="champ">
+      <label for="objectif_total">Objectif d'épargne (€)</label>
+      <input type="number" id="objectif_total" name="objectif_total" min="1" step="1"
+             value="{{ objectif_defaut | int }}">
+    </div>
+    <div class="champ">
+      <label for="date_debut">Premier mois du plan</label>
+      <input type="date" id="date_debut" name="date_debut" value="{{ date_debut_defaut.isoformat() }}">
+    </div>
+    <button type="submit" class="bouton" style="width:100%;">Ajouter et générer un code d'accès</button>
+  </form>
+</div>
+
+{% endblock %}

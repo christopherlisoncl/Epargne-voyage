@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block titre %}{{ participant.nom }} — Espace coach{% endblock %}
+{% block contenu %}
+
+<div class="fil-ariane"><a href="{{ url_for('coach.overview') }}">← Vue d'ensemble</a></div>
+
+<div class="entete-page">
+  <h1>{{ participant.nom }}</h1>
+  <span class="badge {{ stats.statut }}">{{ statut_label }}</span>
+</div>
+
+<div class="grille-2col">
+  <div class="carte">
+    <h2>Progression</h2>
+    <div class="pourcentage">{{ stats.pourcentage }}%</div>
+    <div class="barre-progression">
+      <div class="remplissage" style="width: {{ stats.pourcentage }}%;"></div>
+    </div>
+    <p class="muted" style="margin-top:10px;">
+      {{ stats.cumul_realise_total | euros }} épargnés · écart de
+      {% if stats.ecart >= 0 %}+{% endif %}{{ stats.ecart | euros }} par rapport au plan à ce jour.
+    </p>
+
+    <form method="post" action="{{ url_for('coach.maj_objectif', participant_id=participant.id) }}" style="margin-top:16px;">
+      <div class="champ">
+        <label for="objectif_total">Objectif total (€)</label>
+        <input type="number" min="1" step="1" id="objectif_total" name="objectif_total"
+               value="{{ participant.objectif_total | round(0) | int }}">
+      </div>
+      <button type="submit" class="bouton secondaire petit">Mettre à jour l'objectif</button>
+    </form>
+  </div>
+
+  <div class="carte">
+    <h2>Accès</h2>
+    <p class="muted">Code personnel de {{ participant.nom }} :</p>
+    <span class="code-acces">{{ participant.code_visible }}</span>
+    <form method="post" action="{{ url_for('coach.regenerer_code', participant_id=participant.id) }}" style="margin-top:16px;"
+          onsubmit="return confirm('Générer un nouveau code pour {{ participant.nom }} ? L\'ancien ne fonctionnera plus.');">
+      <button type="submit" class="bouton discret petit">Régénérer le code</button>
+    </form>
+  </div>
+</div>
+
+<div class="carte">
+  <h2>Rendez-vous 1-to-1</h2>
+
+  <form method="post" action="{{ url_for('coach.ajouter_rdv', participant_id=participant.id) }}" class="grille-2col" style="margin-bottom:20px;">
+    <div class="champ mb-0">
+      <label for="date_rdv">Date du rendez-vous</label>
+      <input type="date" id="date_rdv" name="date_rdv" required>
+    </div>
+    <div class="champ mb-0">
+      <label for="notes">Notes / conseils</label>
+      <textarea id="notes" name="notes" placeholder="Ce qui a été dit, conseils pour la suite…"></textarea>
+    </div>
+    <div style="grid-column: 1 / -1;">
+      <button type="submit" class="bouton petit">Ajouter le rendez-vous</button>
+    </div>
+  </form>
+
+  {% if not rendezvous %}
+    <p class="muted">Aucun rendez-vous enregistré pour l'instant.</p>
+  {% else %}
+    {% for r in rendezvous %}
+      <div class="rdv-carte">
+        <details>
+          <summary style="cursor:pointer;">
+            <span class="date-rdv">{{ r.date_rdv | date_fr }}</span>
+            {% if r.date_rdv > today %}<span class="muted"> (à venir)</span>{% endif %}
+          </summary>
+          <form method="post" action="{{ url_for('coach.modifier_rdv', participant_id=participant.id, rdv_id=r.id) }}" style="margin-top:12px;">
+            <div class="champ">
+              <label>Date</label>
+              <input type="date" name="date_rdv" value="{{ r.date_rdv.isoformat() }}">
+            </div>
+            <div class="champ">
+              <label>Notes</label>
+              <textarea name="notes">{{ r.notes or '' }}</textarea>
+            </div>
+            <div class="flex-entre">
+              <button type="submit" class="bouton secondaire petit">Enregistrer</button>
+              <button type="submit" class="bouton discret petit"
+                      formaction="{{ url_for('coach.supprimer_rdv', participant_id=participant.id, rdv_id=r.id) }}"
+                      onclick="return confirm('Supprimer ce rendez-vous ?');">Supprimer</button>
+            </div>
+          </form>
+        </details>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<div class="carte">
+  <h2>Tableau de suivi mensuel</h2>
+  <p class="muted">Tu peux corriger les montants prévus ou déclarés par {{ participant.nom }} si besoin.</p>
+  <form method="post" action="{{ url_for('coach.maj_montants', participant_id=participant.id) }}">
+    <div class="tableau-scroll">
+      <table class="suivi">
+        <thead>
+          <tr>
+            <th class="mois-nom">Mois</th>
+            <th>Prévu</th>
+            <th>Réalisé</th>
+            <th>Cumul réalisé</th>
+            <th>Écart</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ligne in lignes %}
+          <tr class="{% if ligne.est_mois_courant %}mois-courant{% elif ligne.est_futur %}mois-futur{% endif %}">
+            <td class="mois-nom">{{ ligne.mois | mois_fr | capitalize }}</td>
+            <td>
+              <input type="number" min="0" step="1" name="prevu_{{ ligne.id }}"
+                     value="{{ ligne.epargne_prevue | round(0) | int }}">
+            </td>
+            <td>
+              <input type="number" min="0" step="1" name="realise_{{ ligne.id }}"
+                     value="{{ ligne.epargne_realisee | round(0) | int }}">
+            </td>
+            <td>{{ ligne.cumul_realise | euros }}</td>
+            <td class="{% if ligne.ecart >= 0 %}ecart-positif{% else %}ecart-negatif{% endif %}">
+              {% if ligne.ecart >= 0 %}+{% endif %}{{ ligne.ecart | euros }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:18px;">
+      <button type="submit" class="bouton">Enregistrer les montants</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

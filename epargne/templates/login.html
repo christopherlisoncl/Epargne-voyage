@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titre %}Connexion — Cagnotte Voyage{% endblock %}
+{% block entete %}{% endblock %}
+{% block contenu %}
+<div class="page-login">
+  <div class="bloc-login">
+    <div class="titre-app">
+      <span class="emoji">🌍</span>
+      <h1>Cagnotte Voyage</h1>
+      <p>Suis ton épargne pour le voyage, mois après mois.</p>
+    </div>
+
+    <div class="carte">
+      <form method="post">
+        <div class="champ">
+          <label for="participant_id">Ton nom</label>
+          <select id="participant_id" name="participant_id" required>
+            <option value="" disabled selected>Choisis ton nom…</option>
+            {% for p in participants %}
+              <option value="{{ p.id }}">{{ p.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="champ">
+          <label for="code">Ton code personnel</label>
+          <input type="password" inputmode="numeric" pattern="[0-9]*" id="code" name="code"
+                 placeholder="•••• " maxlength="6" required autocomplete="off">
+        </div>
+        <button type="submit" class="bouton" style="width:100%;">Me connecter</button>
+      </form>
+    </div>
+
+    <div class="lien-coach">
+      Tu es le coach ? <a href="{{ url_for('auth.coach_login') }}">Accéder à l'espace coach →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

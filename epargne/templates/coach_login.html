@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Espace coach — Connexion{% endblock %}
+{% block entete %}{% endblock %}
+{% block contenu %}
+<div class="page-login">
+  <div class="bloc-login">
+    <div class="titre-app">
+      <span class="emoji">🧭</span>
+      <h1>Espace coach</h1>
+      <p>Vue d'ensemble et suivi des participants.</p>
+    </div>
+
+    <div class="carte">
+      <form method="post">
+        <div class="champ">
+          <label for="code">Code coach</label>
+          <input type="password" inputmode="numeric" pattern="[0-9]*" id="code" name="code"
+                 placeholder="••••••" maxlength="6" required autocomplete="off" autofocus>
+        </div>
+        <button type="submit" class="bouton" style="width:100%;">Accéder à l'espace coach</button>
+      </form>
+    </div>
+
+    <div class="lien-coach">
+      <a href="{{ url_for('auth.login') }}">← Retour à l'espace participant</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

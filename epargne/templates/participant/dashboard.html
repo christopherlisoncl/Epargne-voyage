@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block titre %}Mon suivi — Cagnotte Voyage{% endblock %}
+{% block contenu %}
+
+<div class="entete-page">
+  <h1>Salut {{ participant.nom }} 👋</h1>
+</div>
+
+<div class="carte">
+  <div class="flex-entre" style="margin-bottom:14px;">
+    <h2 class="mb-0">Objectif : {{ participant.objectif_total | euros }}</h2>
+    <span class="badge {{ stats.statut }}">{{ statut_label }}</span>
+  </div>
+  <div class="bloc-progression">
+    <div class="progression-details">
+      <div class="pourcentage">{{ stats.pourcentage }}%</div>
+      <div class="barre-progression">
+        <div class="remplissage" style="width: {{ stats.pourcentage }}%;"></div>
+      </div>
+      <p class="muted" style="margin-bottom:0; margin-top:10px;">
+        {{ stats.cumul_realise_total | euros }} épargnés sur {{ participant.objectif_total | euros }}
+        {% if stats.ecart >= 0 %}
+          — tu as {{ stats.ecart | euros }} d'avance sur ton plan, continue comme ça !
+        {% else %}
+          — il te manque {{ (-stats.ecart) | euros }} par rapport au plan prévu à ce jour.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="grille-2col">
+  <div class="carte">
+    <h2>Mes rendez-vous</h2>
+    <p><strong>Dernier RDV :</strong>
+      {% if dernier_rdv %}{{ dernier_rdv.date_rdv | date_fr }}{% else %}<span class="muted">aucun pour l'instant</span>{% endif %}
+    </p>
+    {% if dernier_rdv and dernier_rdv.notes %}
+      <div class="rdv-carte">
+        <div class="notes">{{ dernier_rdv.notes }}</div>
+      </div>
+    {% elif dernier_rdv %}
+      <p class="muted">Pas de note laissée par ton coach pour ce rendez-vous.</p>
+    {% endif %}
+
+    <p><strong>Prochain RDV :</strong>
+      {% if prochain_rdv %}{{ prochain_rdv.date_rdv | date_fr }}{% else %}<span class="muted">à planifier avec ton coach</span>{% endif %}
+    </p>
+  </div>
+
+  <div class="carte">
+    <h2>Conseils de ton coach</h2>
+    {% set notes_rdv = participant.rendezvous | selectattr('notes') | selectattr('notes', 'ne', '') | list %}
+    {% if notes_rdv %}
+      {% for r in notes_rdv | sort(attribute='date_rdv', reverse=True) %}
+        <div class="rdv-carte">
+          <div class="date-rdv">{{ r.date_rdv | date_fr }}</div>
+          <div class="notes">{{ r.notes }}</div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="muted">Aucune note pour l'instant.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="carte">
+  <h2>Mon tableau de suivi mensuel</h2>
+  <p class="muted">Saisis ce que tu as réellement épargné chaque mois, puis enregistre.</p>
+  <form method="post" action="{{ url_for('participant.enregistrer') }}">
+    <div class="tableau-scroll">
+      <table class="suivi">
+        <thead>
+          <tr>
+            <th class="mois-nom">Mois</th>
+            <th>Prévu</th>
+            <th>Réalisé</th>
+            <th>Cumul réalisé</th>
+            <th>Écart</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ligne in lignes %}
+          <tr class="{% if ligne.est_mois_courant %}mois-courant{% elif ligne.est_futur %}mois-futur{% endif %}">
+            <td class="mois-nom">{{ ligne.mois | mois_fr | capitalize }}</td>
+            <td>{{ ligne.epargne_prevue | euros }}</td>
+            <td>
+              <input type="number" min="0" step="1" name="montant_{{ ligne.id }}"
+                     value="{{ ligne.epargne_realisee | round(0) | int }}">
+            </td>
+            <td>{{ ligne.cumul_realise | euros }}</td>
+            <td class="{% if ligne.ecart >= 0 %}ecart-positif{% else %}ecart-negatif{% endif %}">
+              {% if ligne.ecart >= 0 %}+{% endif %}{{ ligne.ecart | euros }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:18px;">
+      <button type="submit" class="bouton">Enregistrer mes montants</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

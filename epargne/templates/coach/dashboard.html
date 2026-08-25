@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titre %}Espace coach — Vue d'ensemble{% endblock %}
+{% block contenu %}
+
+<div class="entete-page">
+  <h1>Vue d'ensemble</h1>
+  <a class="bouton" href="{{ url_for('coach.nouveau_participant') }}">+ Ajouter un participant</a>
+</div>
+
+<div class="grille-indicateurs">
+  <div class="indicateur moyenne">
+    <div class="valeur">{{ progression_moyenne }}%</div>
+    <div class="libelle">Progression moyenne du groupe</div>
+  </div>
+  <div class="indicateur a_jour">
+    <div class="valeur">{{ compteurs.a_jour }}</div>
+    <div class="libelle">À jour</div>
+  </div>
+  <div class="indicateur a_surveiller">
+    <div class="valeur">{{ compteurs.a_surveiller }}</div>
+    <div class="libelle">À surveiller</div>
+  </div>
+  <div class="indicateur en_retard">
+    <div class="valeur">{{ compteurs.en_retard }}</div>
+    <div class="libelle">En retard</div>
+  </div>
+</div>
+
+<div class="carte">
+  <h2>Participants ({{ total_participants }})</h2>
+
+  {% if not lignes %}
+    <p class="muted">Aucun participant pour l'instant. Ajoute le premier membre du groupe !</p>
+  {% else %}
+    <div class="liste-participants">
+      {% for ligne in lignes %}
+      <a class="ligne-participant" href="{{ url_for('coach.detail', participant_id=ligne.participant.id) }}" style="color:inherit;">
+        <span class="nom">{{ ligne.participant.nom }}</span>
+        <span class="mini-barre"><span class="remplissage" style="width: {{ ligne.stats.pourcentage }}%;"></span></span>
+        <span>{{ ligne.stats.pourcentage }}%</span>
+        <span class="badge {{ ligne.stats.statut }}">{{ ligne.statut_label }}</span>
+        <span class="rdv-info">
+          Dernier RDV : {% if ligne.dernier_rdv %}{{ ligne.dernier_rdv.date_rdv | date_fr }}{% else %}—{% endif %}<br>
+          Prochain RDV : {% if ligne.prochain_rdv %}{{ ligne.prochain_rdv.date_rdv | date_fr }}{% else %}—{% endif %}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

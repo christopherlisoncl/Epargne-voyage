@@ -1,0 +1,335 @@
+:root {
+  --sable: #fff8f0;
+  --sable-fonce: #f3e4d0;
+  --terracotta: #e07a5f;
+  --terracotta-fonce: #c96449;
+  --teal: #2f6b6a;
+  --teal-clair: #eaf3f2;
+  --encre: #3a3128;
+  --gris-doux: #83766a;
+  --vert: #6a9c78;
+  --vert-fond: #e6f2e8;
+  --ambre: #d8952c;
+  --ambre-fond: #fbf0dd;
+  --rouge: #c4553e;
+  --rouge-fond: #fbe9e4;
+  --blanc: #ffffff;
+  --ombre: 0 4px 16px rgba(58, 49, 40, 0.08);
+  --rayon: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--sable);
+  color: var(--encre);
+  line-height: 1.5;
+}
+
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.conteneur {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* --- Entête --- */
+.entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--blanc);
+  box-shadow: var(--ombre);
+}
+
+.entete .marque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--terracotta-fonce);
+}
+
+.entete .marque .emoji { font-size: 1.4rem; }
+
+.entete .lien-deconnexion {
+  font-size: 0.9rem;
+  color: var(--gris-doux);
+}
+
+/* --- Cartes --- */
+.carte {
+  background: var(--blanc);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.carte h2 {
+  margin-top: 0;
+}
+
+/* --- Boutons --- */
+.bouton {
+  display: inline-block;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--terracotta);
+  color: white;
+  transition: transform 0.05s ease, background 0.15s ease;
+}
+.bouton:hover { background: var(--terracotta-fonce); text-decoration: none; }
+.bouton:active { transform: scale(0.98); }
+
+.bouton.secondaire {
+  background: var(--teal-clair);
+  color: var(--teal);
+}
+.bouton.secondaire:hover { background: #dcecea; }
+
+.bouton.discret {
+  background: transparent;
+  color: var(--gris-doux);
+  padding: 8px 14px;
+}
+.bouton.discret:hover { background: var(--sable-fonce); }
+
+.bouton.petit { padding: 8px 16px; font-size: 0.9rem; }
+
+/* --- Formulaires --- */
+label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.92rem; }
+
+input[type="text"], input[type="number"], input[type="date"], input[type="password"],
+select, textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #e6dccb;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--sable);
+  color: var(--encre);
+  font-family: inherit;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 1px;
+  background: white;
+}
+
+.champ { margin-bottom: 16px; }
+
+textarea { min-height: 90px; resize: vertical; }
+
+/* --- Login --- */
+.page-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.bloc-login {
+  width: 100%;
+  max-width: 420px;
+}
+
+.bloc-login .titre-app {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.bloc-login .titre-app .emoji { font-size: 2.6rem; display: block; margin-bottom: 8px; }
+.bloc-login .titre-app h1 { margin: 0; font-size: 1.5rem; color: var(--terracotta-fonce); }
+.bloc-login .titre-app p { color: var(--gris-doux); margin: 6px 0 0; }
+
+.lien-coach {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.9rem;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+.message.error { background: var(--rouge-fond); color: var(--rouge); }
+.message.success { background: var(--vert-fond); color: #3f6b4c; }
+
+/* --- Progression --- */
+.bloc-progression { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.anneau-progression {
+  flex-shrink: 0;
+}
+.progression-details { flex: 1; min-width: 200px; }
+.progression-details .pourcentage {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--terracotta-fonce);
+}
+.barre-progression {
+  height: 12px;
+  background: var(--sable-fonce);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.barre-progression .remplissage {
+  height: 100%;
+  background: linear-gradient(90deg, var(--terracotta), #f2a488);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* --- Badges de statut --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge.a_jour { background: var(--vert-fond); color: #3f6b4c; }
+.badge.a_surveiller { background: var(--ambre-fond); color: #8a5c14; }
+.badge.en_retard { background: var(--rouge-fond); color: var(--rouge); }
+
+/* --- Tableau mensuel --- */
+.tableau-scroll { overflow-x: auto; margin: 0 -4px; }
+table.suivi {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+table.suivi th, table.suivi td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--sable-fonce);
+  font-size: 0.92rem;
+}
+table.suivi th:first-child, table.suivi td:first-child,
+table.suivi th, table.suivi td { }
+table.suivi thead th {
+  text-align: right;
+  color: var(--gris-doux);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+table.suivi td.mois-nom, table.suivi th.mois-nom { text-align: left; font-weight: 600; }
+table.suivi tr.mois-courant td { background: var(--teal-clair); }
+table.suivi tr.mois-futur td { color: var(--gris-doux); }
+table.suivi td.ecart-positif { color: #3f6b4c; font-weight: 600; }
+table.suivi td.ecart-negatif { color: var(--rouge); font-weight: 600; }
+table.suivi input[type="number"] {
+  width: 100px;
+  padding: 7px 10px;
+  text-align: right;
+}
+
+/* --- Vue coach : liste participants --- */
+.grille-indicateurs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.indicateur {
+  background: var(--blanc);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  padding: 18px;
+  text-align: center;
+}
+.indicateur .valeur { font-size: 1.8rem; font-weight: 800; }
+.indicateur .libelle { color: var(--gris-doux); font-size: 0.85rem; margin-top: 4px; }
+.indicateur.a_jour .valeur { color: #3f6b4c; }
+.indicateur.a_surveiller .valeur { color: #8a5c14; }
+.indicateur.en_retard .valeur { color: var(--rouge); }
+.indicateur.moyenne .valeur { color: var(--terracotta-fonce); }
+
+.liste-participants { display: flex; flex-direction: column; gap: 10px; }
+.ligne-participant {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--blanc);
+  border-radius: 12px;
+  box-shadow: var(--ombre);
+  flex-wrap: wrap;
+}
+.ligne-participant .nom { font-weight: 700; flex: 1; min-width: 140px; }
+.ligne-participant .mini-barre {
+  width: 100px;
+  height: 8px;
+  background: var(--sable-fonce);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ligne-participant .mini-barre .remplissage { height: 100%; background: var(--terracotta); }
+.ligne-participant .rdv-info { font-size: 0.82rem; color: var(--gris-doux); min-width: 150px; }
+
+.entete-page {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.entete-page h1 { margin: 0; }
+
+.fil-ariane { font-size: 0.88rem; color: var(--gris-doux); margin-bottom: 14px; }
+
+.grille-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 700px) {
+  .grille-2col { grid-template-columns: 1fr; }
+}
+
+.rdv-carte {
+  background: var(--sable);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.rdv-carte .date-rdv { font-weight: 700; color: var(--teal); }
+.rdv-carte .notes { margin-top: 6px; white-space: pre-wrap; color: var(--encre); }
+.rdv-carte .notes.vide { color: var(--gris-doux); font-style: italic; }
+
+.code-acces {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  background: var(--teal-clair);
+  color: var(--teal);
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.muted { color: var(--gris-doux); }
+.mb-0 { margin-bottom: 0; }
+.flex-entre { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+footer.pied {
+  text-align: center;
+  color: var(--gris-doux);
+  font-size: 0.82rem;
+  padding: 30px 16px 10px;
+}
