@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 
 from .auth import coach_required
 from .extensions import db
-from .models import Participant, RendezVous, Coach
+from .models import Participant, RendezVous, Coach, MoisEpargne
 from .utils import (
     calculer_tableau_mensuel,
     calculer_statistiques,
@@ -165,14 +165,30 @@ def maj_montants(participant_id):
 def maj_objectif(participant_id):
     participant = Participant.query.get_or_404(participant_id)
     nouvel_objectif = request.form.get("objectif_total", "").strip().replace(",", ".")
+    date_debut_str = request.form.get("date_debut", "").strip()
 
     try:
         participant.objectif_total = max(1.0, float(nouvel_objectif))
-        participant.generer_plan_mensuel()
-        db.session.commit()
-        flash(f"Objectif de {participant.nom} mis à jour ({participant.objectif_total:.0f} €).", "success")
     except ValueError:
         flash("Montant d'objectif invalide.", "error")
+        return redirect(url_for("coach.detail", participant_id=participant.id))
+
+    if date_debut_str:
+        try:
+            nouvelle_date = datetime.strptime(date_debut_str, "%Y-%m-%d").date()
+        except ValueError:
+            flash("Date de début invalide.", "error")
+            return redirect(url_for("coach.detail", participant_id=participant.id))
+
+        if nouvelle_date != participant.date_debut:
+            # Le mapping mois <-> ligne change entièrement : on repart d'un plan vierge
+            # (les montants déjà déclarés sur l'ancien calendrier ne peuvent pas être reportés).
+            participant.date_debut = nouvelle_date
+            MoisEpargne.query.filter_by(participant_id=participant.id).delete()
+
+    participant.generer_plan_mensuel()
+    db.session.commit()
+    flash(f"Plan de {participant.nom} mis à jour.", "success")
 
     return redirect(url_for("coach.detail", participant_id=participant.id))
 

@@ -21,13 +21,18 @@
       {% if stats.ecart >= 0 %}+{% endif %}{{ stats.ecart | euros }} par rapport au plan à ce jour.
     </p>
 
-    <form method="post" action="{{ url_for('coach.maj_objectif', participant_id=participant.id) }}" style="margin-top:16px;">
+    <form method="post" action="{{ url_for('coach.maj_objectif', participant_id=participant.id) }}" style="margin-top:16px;"
+          onsubmit="var d=this.querySelector('[name=date_debut]'); return d.value === '{{ participant.date_debut.isoformat() }}' || confirm('Changer la date de début régénère tout le calendrier mensuel et remet les montants déjà déclarés à zéro. Continuer ?');">
       <div class="champ">
         <label for="objectif_total">Objectif total (€)</label>
         <input type="number" min="1" step="1" id="objectif_total" name="objectif_total"
                value="{{ participant.objectif_total | round(0) | int }}">
       </div>
-      <button type="submit" class="bouton secondaire petit">Mettre à jour l'objectif</button>
+      <div class="champ">
+        <label for="date_debut">Premier mois du plan</label>
+        <input type="date" id="date_debut" name="date_debut" value="{{ participant.date_debut.isoformat() }}">
+      </div>
+      <button type="submit" class="bouton secondaire petit">Mettre à jour le plan</button>
     </form>
   </div>
 

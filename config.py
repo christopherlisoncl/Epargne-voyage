@@ -19,7 +19,7 @@ class Config:
     # Paramètres par défaut du projet d'épargne
     OBJECTIF_DEFAUT = 2000.0
     NB_MOIS_DEFAUT = 12
-    DATE_DEBUT_DEFAUT = date(2025, 9, 1)
+    DATE_DEBUT_DEFAUT = date(2026, 9, 1)
 
     # Nom du coach par défaut créé au premier lancement (flask init-db)
     COACH_NOM_DEFAUT = os.environ.get("COACH_NOM_DEFAUT", "Coach")
