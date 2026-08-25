@@ -23,6 +23,10 @@ class Coach(db.Model):
     # (outil déclaratif à faible enjeu, pas de données bancaires).
     code_visible = db.Column(db.String(6), nullable=False)
 
+    email = db.Column(db.String(255), nullable=True)
+    telephone = db.Column(db.String(50), nullable=True)
+    lien_rdv = db.Column(db.String(500), nullable=True)
+
     def set_code(self, code: str):
         self.code_visible = code
         self.code_hash = generate_password_hash(code, method="pbkdf2:sha256")

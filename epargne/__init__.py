@@ -47,6 +47,32 @@ def register_cli(app):
             else:
                 click.echo("Base déjà initialisée.")
 
+    @app.cli.command("migrate-db")
+    def migrate_db_command():
+        """Ajoute les colonnes manquantes aux tables existantes, sans perte de données."""
+        from sqlalchemy import inspect, text
+
+        with app.app_context():
+            inspector = inspect(db.engine)
+            existing_cols = {c["name"] for c in inspector.get_columns("coach")}
+            colonnes_attendues = {
+                "email": "VARCHAR(255)",
+                "telephone": "VARCHAR(50)",
+                "lien_rdv": "VARCHAR(500)",
+            }
+            a_ajouter = {
+                nom: type_sql
+                for nom, type_sql in colonnes_attendues.items()
+                if nom not in existing_cols
+            }
+            if not a_ajouter:
+                click.echo("Rien à migrer, la base est déjà à jour.")
+                return
+            with db.engine.begin() as conn:
+                for nom, type_sql in a_ajouter.items():
+                    conn.execute(text(f"ALTER TABLE coach ADD COLUMN {nom} {type_sql}"))
+            click.echo(f"{len(a_ajouter)} colonne(s) ajoutée(s) : {', '.join(a_ajouter)}")
+
 
 def register_template_filters(app):
     @app.template_filter("euros")

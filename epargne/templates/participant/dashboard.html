@@ -46,6 +46,23 @@
     <p><strong>Prochain RDV :</strong>
       {% if prochain_rdv %}{{ prochain_rdv.date_rdv | date_fr }}{% else %}<span class="muted">à planifier avec ton coach</span>{% endif %}
     </p>
+
+    {% if coach and (coach.lien_rdv or coach.email or coach.telephone) %}
+      <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--sable-fonce);">
+        {% if coach.lien_rdv %}
+          <a class="bouton petit" href="{{ coach.lien_rdv }}" target="_blank" rel="noopener">
+            📅 Réserver un créneau
+          </a>
+        {% endif %}
+        {% if coach.email or coach.telephone %}
+          <p class="muted" style="margin-top:12px; margin-bottom:0;">
+            Ou contacte directement {{ coach.nom }} :
+            {% if coach.email %}<br>📧 <a href="mailto:{{ coach.email }}">{{ coach.email }}</a>{% endif %}
+            {% if coach.telephone %}<br>📞 <a href="tel:{{ coach.telephone | replace(' ', '') }}">{{ coach.telephone }}</a>{% endif %}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 
   <div class="carte">

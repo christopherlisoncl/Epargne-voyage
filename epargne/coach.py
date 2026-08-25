@@ -1,10 +1,10 @@
 from datetime import datetime, date
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 from .auth import coach_required
 from .extensions import db
-from .models import Participant, RendezVous
+from .models import Participant, RendezVous, Coach
 from .utils import (
     calculer_tableau_mensuel,
     calculer_statistiques,
@@ -15,6 +15,22 @@ from .utils import (
 from config import Config
 
 coach_bp = Blueprint("coach", __name__, url_prefix="/coach")
+
+
+@coach_bp.route("/profil", methods=["GET", "POST"])
+@coach_required
+def profil():
+    coach = Coach.query.get(session["user_id"])
+
+    if request.method == "POST":
+        coach.email = request.form.get("email", "").strip()
+        coach.telephone = request.form.get("telephone", "").strip()
+        coach.lien_rdv = request.form.get("lien_rdv", "").strip()
+        db.session.commit()
+        flash("Ton profil a été mis à jour.", "success")
+        return redirect(url_for("coach.profil"))
+
+    return render_template("coach/profil.html", coach=coach)
 
 
 @coach_bp.route("/")

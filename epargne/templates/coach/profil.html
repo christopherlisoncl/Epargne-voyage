@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titre %}Mon profil — Espace coach{% endblock %}
+{% block contenu %}
+
+<div class="fil-ariane"><a href="{{ url_for('coach.overview') }}">← Vue d'ensemble</a></div>
+
+<div class="carte" style="max-width:520px; margin: 0 auto;">
+  <h1>Mon profil</h1>
+  <p class="muted">Ces informations sont visibles par tous les participants, pour qu'ils puissent te
+    contacter ou prendre rendez-vous.</p>
+
+  <form method="post">
+    <div class="champ">
+      <label for="email">Email de contact</label>
+      <input type="text" id="email" name="email" value="{{ coach.email or '' }}"
+             placeholder="toi@exemple.com">
+    </div>
+    <div class="champ">
+      <label for="telephone">Téléphone</label>
+      <input type="text" id="telephone" name="telephone" value="{{ coach.telephone or '' }}"
+             placeholder="06 12 34 56 78">
+    </div>
+    <div class="champ">
+      <label for="lien_rdv">Lien de prise de rendez-vous</label>
+      <input type="text" id="lien_rdv" name="lien_rdv" value="{{ coach.lien_rdv or '' }}"
+             placeholder="https://calendar.app.google/...">
+      <p class="muted" style="margin-top:6px; margin-bottom:0;">
+        Lien Google Calendar, Calendly ou autre — affiché comme bouton "Réserver un créneau" aux participants.
+      </p>
+    </div>
+    <button type="submit" class="bouton" style="width:100%;">Enregistrer</button>
+  </form>
+</div>
+
+{% endblock %}

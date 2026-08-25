@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 
 from .auth import participant_required
 from .extensions import db
-from .models import Participant, MoisEpargne
+from .models import Participant, MoisEpargne, Coach
 from .utils import calculer_tableau_mensuel, calculer_statistiques, prochain_et_dernier_rdv, STATUT_LABELS
 
 participant_bp = Blueprint("participant", __name__, url_prefix="/espace")
@@ -23,6 +23,7 @@ def dashboard():
     lignes = calculer_tableau_mensuel(participant)
     stats = calculer_statistiques(participant)
     dernier_rdv, prochain_rdv = prochain_et_dernier_rdv(participant)
+    coach = Coach.query.first()
 
     return render_template(
         "participant/dashboard.html",
@@ -32,6 +33,7 @@ def dashboard():
         statut_label=STATUT_LABELS[stats["statut"]],
         dernier_rdv=dernier_rdv,
         prochain_rdv=prochain_rdv,
+        coach=coach,
     )
 
 
