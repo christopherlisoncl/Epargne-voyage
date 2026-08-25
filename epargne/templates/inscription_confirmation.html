@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Bienvenue — Cagnotte Voyage{% endblock %}
+{% block entete %}{% endblock %}
+{% block contenu %}
+<div class="page-login">
+  <div class="bloc-login">
+    <div class="titre-app">
+      <span class="emoji">🎉</span>
+      <h1>Bienvenue {{ nom }} !</h1>
+      <p>Ton espace est prêt.</p>
+    </div>
+
+    <div class="carte" style="text-align:center;">
+      <p class="muted" style="margin-bottom:6px;">Ton code personnel :</p>
+      <span class="code-acces" style="font-size:1.8rem;">{{ code }}</span>
+
+      <p class="muted" style="margin-top:18px;">
+        {% if email_envoye %}
+          On vient aussi de t'envoyer ces informations par email à {{ email }} — garde-les précieusement.
+        {% else %}
+          Note bien ce code quelque part : c'est lui qui te permettra de te connecter.
+        {% endif %}
+      </p>
+
+      <a class="bouton" style="width:100%; margin-top:14px;" href="{{ url_for('auth.login') }}">Me connecter maintenant</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

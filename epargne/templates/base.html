@@ -11,10 +11,12 @@
   <div class="entete">
     <div class="marque"><span class="emoji">🌍</span> Cagnotte Voyage</div>
     {% if session.get('role') %}
-      {% if session.get('role') == 'coach' %}
-        <a class="lien-deconnexion" href="{{ url_for('coach.profil') }}" style="margin-right:16px;">Mon profil</a>
-      {% endif %}
-      <a class="lien-deconnexion" href="{{ url_for('auth.logout') }}">Se déconnecter</a>
+      <div style="display:flex; align-items:center; gap:14px;">
+        {% if session.get('role') == 'coach' %}
+          <a class="bouton secondaire petit" href="{{ url_for('coach.profil') }}">👤 Mon profil</a>
+        {% endif %}
+        <a class="lien-deconnexion" href="{{ url_for('auth.logout') }}">Se déconnecter</a>
+      </div>
     {% endif %}
   </div>
   {% endblock %}

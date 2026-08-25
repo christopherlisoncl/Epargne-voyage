@@ -89,6 +89,52 @@ STATUT_LABELS = {
 }
 
 
+def generer_svg_progression(lignes, objectif_total, largeur=600, hauteur=220):
+    """Génère un petit graphique SVG (cumul prévu vs réalisé) à partir des lignes
+    calculées par calculer_tableau_mensuel."""
+    if not lignes:
+        return ""
+
+    marge_g, marge_d, marge_h, marge_b = 36, 12, 16, 30
+    n = len(lignes)
+    max_val = max(
+        [objectif_total] + [l["cumul_prevu"] for l in lignes] + [l["cumul_realise"] for l in lignes]
+    ) or 1
+
+    def pos_x(i):
+        if n == 1:
+            return marge_g
+        return marge_g + i * (largeur - marge_g - marge_d) / (n - 1)
+
+    def pos_y(val):
+        return hauteur - marge_b - (val / max_val) * (hauteur - marge_h - marge_b)
+
+    pts_prevu = " ".join(f"{pos_x(i):.1f},{pos_y(l['cumul_prevu']):.1f}" for i, l in enumerate(lignes))
+    pts_realise = " ".join(f"{pos_x(i):.1f},{pos_y(l['cumul_realise']):.1f}" for i, l in enumerate(lignes))
+
+    # Étiquettes de mois (une sur deux si trop nombreuses, pour ne pas surcharger)
+    pas_etiquette = 2 if n > 8 else 1
+    etiquettes = ""
+    noms_mois = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"]
+    for i, l in enumerate(lignes):
+        if i % pas_etiquette == 0:
+            etiquettes += (
+                f'<text x="{pos_x(i):.1f}" y="{hauteur - 8}" font-size="10" fill="#83766a" '
+                f'text-anchor="middle">{noms_mois[l["mois"].month - 1]}</text>'
+            )
+
+    dernier_point_x = pos_x(n - 1)
+    dernier_point_y = pos_y(lignes[-1]["cumul_realise"])
+
+    return f'''<svg viewBox="0 0 {largeur} {hauteur}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+  <line x1="{marge_g}" y1="{hauteur - marge_b}" x2="{largeur - marge_d}" y2="{hauteur - marge_b}" stroke="#e6dccb" stroke-width="1"/>
+  <polyline points="{pts_prevu}" fill="none" stroke="#83766a" stroke-width="2" stroke-dasharray="5,5" opacity="0.7"/>
+  <polyline points="{pts_realise}" fill="none" stroke="#e07a5f" stroke-width="3"/>
+  <circle cx="{dernier_point_x:.1f}" cy="{dernier_point_y:.1f}" r="4.5" fill="#e07a5f"/>
+  {etiquettes}
+</svg>'''
+
+
 def prochain_et_dernier_rdv(participant: Participant, aujourdhui: date = None):
     aujourdhui = aujourdhui or date.today()
     rdvs = sorted(participant.rendezvous, key=lambda r: r.date_rdv)

@@ -33,7 +33,15 @@
 
   <div class="carte">
     <h2>Accès</h2>
-    <p class="muted">Code personnel de {{ participant.nom }} :</p>
+    <form method="post" action="{{ url_for('coach.renommer_participant', participant_id=participant.id) }}">
+      <div class="champ">
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="nom" value="{{ participant.nom }}">
+      </div>
+      <button type="submit" class="bouton secondaire petit">Renommer</button>
+    </form>
+
+    <p class="muted" style="margin-top:20px;">Code personnel de {{ participant.nom }} :</p>
     <span class="code-acces">{{ participant.code_visible }}</span>
     <form method="post" action="{{ url_for('coach.regenerer_code', participant_id=participant.id) }}" style="margin-top:16px;"
           onsubmit="return confirm('Générer un nouveau code pour {{ participant.nom }} ? L\'ancien ne fonctionnera plus.');">
@@ -130,6 +138,15 @@
     <div style="margin-top:18px;">
       <button type="submit" class="bouton">Enregistrer les montants</button>
     </div>
+  </form>
+</div>
+
+<div class="carte">
+  <h2 style="color: var(--rouge);">Zone sensible</h2>
+  <p class="muted">Retire définitivement {{ participant.nom }} du suivi (montants, RDV et notes seront supprimés).</p>
+  <form method="post" action="{{ url_for('coach.supprimer_participant', participant_id=participant.id) }}"
+        onsubmit="return confirm('Supprimer définitivement {{ participant.nom }} et toutes ses données ? Cette action est irréversible.');">
+    <button type="submit" class="bouton discret petit" style="color: var(--rouge);">Supprimer {{ participant.nom }}</button>
   </form>
 </div>
 

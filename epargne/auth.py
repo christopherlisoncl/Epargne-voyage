@@ -1,9 +1,12 @@
 from functools import wraps
 
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 
 from .extensions import db
 from .models import Participant, Coach
+from .utils import generer_code_unique
+from .email_utils import envoyer_email_bienvenue
+from config import Config
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -61,6 +64,45 @@ def coach_login():
         flash("Code coach incorrect.", "error")
 
     return render_template("coach_login.html")
+
+
+@auth_bp.route("/inscription", methods=["GET", "POST"])
+def inscription():
+    if request.method == "POST":
+        nom = request.form.get("nom", "").strip()
+        email = request.form.get("email", "").strip()
+
+        if not nom:
+            flash("Le nom est obligatoire.", "error")
+            return redirect(url_for("auth.inscription"))
+
+        participant = Participant(
+            nom=nom,
+            objectif_total=Config.OBJECTIF_DEFAUT,
+            date_debut=Config.DATE_DEBUT_DEFAUT,
+            nb_mois=Config.NB_MOIS_DEFAUT,
+        )
+        code = generer_code_unique()
+        participant.set_code(code)
+        db.session.add(participant)
+        db.session.flush()
+        participant.generer_plan_mensuel()
+        db.session.commit()
+
+        url_site = url_for("auth.login", _external=True)
+        email_envoye = False
+        if email:
+            email_envoye, erreur = envoyer_email_bienvenue(current_app, email, nom, code, url_site)
+
+        return render_template(
+            "inscription_confirmation.html",
+            nom=nom,
+            code=code,
+            email=email,
+            email_envoye=email_envoye,
+        )
+
+    return render_template("inscription.html")
 
 
 @auth_bp.route("/logout")

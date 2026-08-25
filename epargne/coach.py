@@ -1,6 +1,8 @@
-from datetime import datetime, date
+import csv
+import io
+from datetime import datetime, date, timedelta
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, Response
 
 from .auth import coach_required
 from .extensions import db
@@ -59,12 +61,54 @@ def overview():
 
     progression_moyenne = round(somme_pourcentages / len(participants), 1) if participants else 0.0
 
+    aujourdhui = date.today()
+    dans_une_semaine = aujourdhui + timedelta(days=7)
+    rdvs_semaine = []
+    for p in participants:
+        for r in p.rendezvous:
+            if aujourdhui <= r.date_rdv <= dans_une_semaine:
+                rdvs_semaine.append({"participant": p, "rdv": r})
+    rdvs_semaine.sort(key=lambda x: x["rdv"].date_rdv)
+
     return render_template(
         "coach/dashboard.html",
         lignes=lignes,
         compteurs=compteurs,
         progression_moyenne=progression_moyenne,
         total_participants=len(participants),
+        rdvs_semaine=rdvs_semaine,
+    )
+
+
+@coach_bp.route("/export.csv")
+@coach_required
+def export_csv():
+    participants = Participant.query.order_by(Participant.nom).all()
+    output = io.StringIO()
+    output.write("﻿")  # BOM pour un affichage correct des accents dans Excel
+    writer = csv.writer(output)
+    writer.writerow(
+        ["Nom", "Objectif (€)", "Cumul réalisé (€)", "% objectif", "Statut", "Dernier RDV", "Prochain RDV"]
+    )
+    for p in participants:
+        stats = calculer_statistiques(p)
+        dernier_rdv, prochain_rdv = prochain_et_dernier_rdv(p)
+        writer.writerow(
+            [
+                p.nom,
+                p.objectif_total,
+                stats["cumul_realise_total"],
+                stats["pourcentage"],
+                STATUT_LABELS[stats["statut"]],
+                dernier_rdv.date_rdv.strftime("%d/%m/%Y") if dernier_rdv else "",
+                prochain_rdv.date_rdv.strftime("%d/%m/%Y") if prochain_rdv else "",
+            ]
+        )
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=cagnotte_voyage_export.csv"},
     )
 
 
@@ -180,6 +224,31 @@ def supprimer_rdv(participant_id, rdv_id):
     db.session.commit()
     flash("Rendez-vous supprimé.", "success")
     return redirect(url_for("coach.detail", participant_id=participant_id))
+
+
+@coach_bp.route("/participant/<int:participant_id>/renommer", methods=["POST"])
+@coach_required
+def renommer_participant(participant_id):
+    participant = Participant.query.get_or_404(participant_id)
+    nouveau_nom = request.form.get("nom", "").strip()
+    if nouveau_nom:
+        participant.nom = nouveau_nom
+        db.session.commit()
+        flash("Nom mis à jour.", "success")
+    else:
+        flash("Le nom ne peut pas être vide.", "error")
+    return redirect(url_for("coach.detail", participant_id=participant.id))
+
+
+@coach_bp.route("/participant/<int:participant_id>/supprimer", methods=["POST"])
+@coach_required
+def supprimer_participant(participant_id):
+    participant = Participant.query.get_or_404(participant_id)
+    nom = participant.nom
+    db.session.delete(participant)
+    db.session.commit()
+    flash(f"{nom} a été retiré·e du suivi.", "success")
+    return redirect(url_for("coach.overview"))
 
 
 @coach_bp.route("/participant/<int:participant_id>/regenerer-code", methods=["POST"])

@@ -3,7 +3,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from .auth import participant_required
 from .extensions import db
 from .models import Participant, MoisEpargne, Coach
-from .utils import calculer_tableau_mensuel, calculer_statistiques, prochain_et_dernier_rdv, STATUT_LABELS
+from .utils import (
+    calculer_tableau_mensuel,
+    calculer_statistiques,
+    prochain_et_dernier_rdv,
+    generer_svg_progression,
+    STATUT_LABELS,
+)
 
 participant_bp = Blueprint("participant", __name__, url_prefix="/espace")
 
@@ -24,6 +30,7 @@ def dashboard():
     stats = calculer_statistiques(participant)
     dernier_rdv, prochain_rdv = prochain_et_dernier_rdv(participant)
     coach = Coach.query.first()
+    svg_progression = generer_svg_progression(lignes, participant.objectif_total)
 
     return render_template(
         "participant/dashboard.html",
@@ -34,6 +41,7 @@ def dashboard():
         dernier_rdv=dernier_rdv,
         prochain_rdv=prochain_rdv,
         coach=coach,
+        svg_progression=svg_progression,
     )
 
 

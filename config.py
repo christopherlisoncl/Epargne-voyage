@@ -19,3 +19,7 @@ class Config:
     # Nom du coach par défaut créé au premier lancement (flask init-db)
     COACH_NOM_DEFAUT = os.environ.get("COACH_NOM_DEFAUT", "Coach")
     COACH_CODE_DEFAUT = os.environ.get("COACH_CODE_DEFAUT", "000000")
+
+    # Envoi d'email de bienvenue via Gmail (mot de passe d'application, pas le mot de passe du compte)
+    EMAIL_ADRESSE = os.environ.get("EMAIL_ADRESSE", "")
+    EMAIL_MOT_DE_PASSE_APP = os.environ.get("EMAIL_MOT_DE_PASSE_APP", "")

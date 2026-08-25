@@ -26,15 +26,47 @@
   </div>
 </div>
 
+{% if rdvs_semaine %}
 <div class="carte">
-  <h2>Participants ({{ total_participants }})</h2>
+  <h2>📅 Rendez-vous des 7 prochains jours</h2>
+  <div class="liste-participants">
+    {% for item in rdvs_semaine %}
+      <a class="ligne-participant" href="{{ url_for('coach.detail', participant_id=item.participant.id) }}" style="color:inherit;">
+        <span class="nom">{{ item.participant.nom }}</span>
+        <span class="rdv-info">{{ item.rdv.date_rdv | date_fr }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="carte">
+  <div class="flex-entre" style="margin-bottom:16px;">
+    <h2 class="mb-0">Participants ({{ total_participants }})</h2>
+    <a class="bouton secondaire petit" href="{{ url_for('coach.export_csv') }}">⬇ Exporter en CSV</a>
+  </div>
 
   {% if not lignes %}
     <p class="muted">Aucun participant pour l'instant. Ajoute le premier membre du groupe !</p>
   {% else %}
-    <div class="liste-participants">
+    <div class="controles-liste">
+      <input type="text" id="recherche-participant" placeholder="Rechercher un nom...">
+      <select id="tri-participant">
+        <option value="nom">Trier : Nom (A→Z)</option>
+        <option value="statut">Trier : Statut (en retard d'abord)</option>
+        <option value="progression_desc">Trier : Progression (haute → basse)</option>
+        <option value="progression_asc">Trier : Progression (basse → haute)</option>
+      </select>
+    </div>
+
+    <div class="liste-participants" id="liste-participants">
       {% for ligne in lignes %}
-      <a class="ligne-participant" href="{{ url_for('coach.detail', participant_id=ligne.participant.id) }}" style="color:inherit;">
+      <a class="ligne-participant"
+         href="{{ url_for('coach.detail', participant_id=ligne.participant.id) }}"
+         style="color:inherit;"
+         data-nom="{{ ligne.participant.nom | lower }}"
+         data-pourcentage="{{ ligne.stats.pourcentage }}"
+         data-statut-ordre="{{ 0 if ligne.stats.statut == 'en_retard' else (1 if ligne.stats.statut == 'a_surveiller' else 2) }}">
         <span class="nom">{{ ligne.participant.nom }}</span>
         <span class="mini-barre"><span class="remplissage" style="width: {{ ligne.stats.pourcentage }}%;"></span></span>
         <span>{{ ligne.stats.pourcentage }}%</span>
@@ -46,7 +78,44 @@
       </a>
       {% endfor %}
     </div>
+    <p id="aucun-resultat" class="muted" style="display:none;">Aucun participant ne correspond à ta recherche.</p>
   {% endif %}
 </div>
+
+<script>
+(function () {
+  const recherche = document.getElementById('recherche-participant');
+  const tri = document.getElementById('tri-participant');
+  const conteneur = document.getElementById('liste-participants');
+  const aucunResultat = document.getElementById('aucun-resultat');
+  if (!conteneur) return;
+
+  function appliquer() {
+    const terme = (recherche.value || '').trim().toLowerCase();
+    const lignes = Array.from(conteneur.children);
+
+    let visibles = 0;
+    lignes.forEach((ligne) => {
+      const correspond = ligne.dataset.nom.includes(terme);
+      ligne.style.display = correspond ? '' : 'none';
+      if (correspond) visibles += 1;
+    });
+    aucunResultat.style.display = visibles === 0 ? '' : 'none';
+
+    const critere = tri.value;
+    lignes.sort((a, b) => {
+      if (critere === 'nom') return a.dataset.nom.localeCompare(b.dataset.nom);
+      if (critere === 'statut') return a.dataset.statutOrdre - b.dataset.statutOrdre;
+      if (critere === 'progression_desc') return b.dataset.pourcentage - a.dataset.pourcentage;
+      if (critere === 'progression_asc') return a.dataset.pourcentage - b.dataset.pourcentage;
+      return 0;
+    });
+    lignes.forEach((ligne) => conteneur.appendChild(ligne));
+  }
+
+  recherche.addEventListener('input', appliquer);
+  tri.addEventListener('change', appliquer);
+})();
+</script>
 
 {% endblock %}

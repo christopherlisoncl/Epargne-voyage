@@ -29,6 +29,17 @@
   </div>
 </div>
 
+{% if svg_progression %}
+<div class="carte">
+  <h2>Ma progression dans le temps</h2>
+  {{ svg_progression | safe }}
+  <div class="legende-graphique">
+    <span><span class="pastille pastille-realise"></span> Épargne réalisée</span>
+    <span><span class="pastille pastille-prevu"></span> Épargne prévue</span>
+  </div>
+</div>
+{% endif %}
+
 <div class="grille-2col">
   <div class="carte">
     <h2>Mes rendez-vous</h2>
