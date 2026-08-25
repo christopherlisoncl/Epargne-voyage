@@ -6,6 +6,11 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "change-moi-en-production")
+    # IMPORTANT : toujours un chemin ABSOLU (sqlite:////...). Flask-SQLAlchemy
+    # préfixe automatiquement tout chemin sqlite RELATIF avec app.instance_path
+    # (qui vaut déjà .../instance) — un DATABASE_URL du type
+    # "sqlite:///instance/epargne.db" donnerait donc .../instance/instance/epargne.db
+    # (dossier inexistant -> "unable to open database file").
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'epargne.db')}"
     )

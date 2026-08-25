@@ -52,22 +52,31 @@ une console, on le réactive avec `workon epargne-voyage-venv`.)
 Toujours dans `~/epargne-voyage`, crée le fichier `.env` :
 
 ```bash
-nano .env
-```
-
-Colle ce contenu (remplace le code coach par celui que tu veux communiquer à ton coach) :
-
-```
+cat > .env << 'EOF'
 SECRET_KEY=d404b18c4b271d8f2648258f01b19541dc39eaf4ad2cf0d267e31a96e96614fe
-DATABASE_URL=sqlite:///instance/epargne.db
+DATABASE_URL=sqlite:////home/TON_PSEUDO/epargne-voyage/instance/epargne.db
 COACH_NOM_DEFAUT=Coach
 COACH_CODE_DEFAUT=482913
+EMAIL_ADRESSE=toi@gmail.com
+EMAIL_MOT_DE_PASSE_APP=ton-mot-de-passe-application-gmail
+EOF
 ```
 
-Sauvegarde avec `Ctrl+O` puis `Entrée`, quitte avec `Ctrl+X`.
+(remplace `TON_PSEUDO` par ton nom d'utilisateur PythonAnywhere ; colle tout le bloc d'un coup — pas besoin
+d'éditeur de texte comme nano, qui peut être capricieux dans certains navigateurs)
+
+> **Important** : `DATABASE_URL` doit être un chemin **absolu** (4 slashes après `sqlite:`). Flask-SQLAlchemy
+> préfixe automatiquement tout chemin *relatif* avec le dossier `instance/` de l'appli — un chemin relatif du
+> type `sqlite:///instance/epargne.db` donnerait donc `.../instance/instance/epargne.db` (dossier inexistant,
+> erreur "unable to open database file"). Reste sur un chemin absolu et ce piège n'arrive jamais.
 
 > La `SECRET_KEY` ci-dessus a été générée aléatoirement pour ce projet — tu peux la garder, ou en générer
 > une autre toi-même avec `python3 -c "import secrets; print(secrets.token_hex(32))"`.
+>
+> Pour `EMAIL_ADRESSE` / `EMAIL_MOT_DE_PASSE_APP` (envoi de l'email de bienvenue à l'inscription), voir la
+> section **Envoi d'email (Gmail)** plus bas. Tu peux laisser ces deux lignes vides pour l'instant si tu ne
+> veux pas encore configurer l'email — l'inscription fonctionnera quand même, le code s'affichera juste à
+> l'écran au lieu d'être envoyé par email.
 
 ## F. Initialiser la base de données
 
@@ -128,14 +137,28 @@ cd epargne-voyage
 git pull
 workon epargne-voyage-venv
 pip install -r requirements.txt   # seulement si requirements.txt a changé
+flask migrate-db                  # ajoute les nouvelles colonnes s'il y en a, sans perte de données
 ```
 
 Puis retourne sur l'onglet **Web** et clique **Reload**.
+
+## Envoi d'email (Gmail)
+
+Pour que le formulaire d'inscription (`/inscription`) envoie un vrai email de bienvenue :
+
+1. Active la validation en 2 étapes sur ton compte Google : [myaccount.google.com/security](https://myaccount.google.com/security)
+2. Génère un mot de passe d'application : [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+3. Renseigne `EMAIL_ADRESSE` (ton adresse Gmail) et `EMAIL_MOT_DE_PASSE_APP` (le mot de passe généré, sans les
+   espaces) dans le fichier `.env`, en local et sur PythonAnywhere.
+4. Redémarre (localement : relance `python run.py` ; sur PythonAnywhere : clique **Reload**).
+
+Sans cette configuration, l'inscription fonctionne quand même : le code d'accès s'affiche directement à
+l'écran au lieu d'être envoyé par email.
 
 ## À savoir sur l'offre gratuite
 
 - L'adresse est en `TON_PSEUDO.pythonanywhere.com` (pas de domaine personnalisé sans passer à un forfait
   payant, ~5 $/mois).
-- PythonAnywhere désactive les sites gratuits inactifs après 3 mois : reconnecte-toi de temps en temps et
-  clique sur **"Run until 3 months from today"** dans l'onglet Web pour prolonger.
+- PythonAnywhere désactive les sites gratuits inactifs après 1 mois : reconnecte-toi de temps en temps et
+  clique sur **"Run until 1 month from today"** dans l'onglet Web pour prolonger.
 - Pense à télécharger de temps en temps `instance/epargne.db` (onglet Files) comme sauvegarde.
