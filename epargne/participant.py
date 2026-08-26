@@ -8,6 +8,8 @@ from .utils import (
     calculer_statistiques,
     prochain_et_dernier_rdv,
     generer_jauge_circulaire,
+    calculer_serie_a_jour,
+    jours_avant_voyage,
     STATUT_LABELS,
 )
 
@@ -31,6 +33,8 @@ def dashboard():
     dernier_rdv, prochain_rdv = prochain_et_dernier_rdv(participant)
     coach = Coach.query.first()
     svg_jauge = generer_jauge_circulaire(stats["pourcentage"], stats["statut"])
+    serie_a_jour = calculer_serie_a_jour(lignes)
+    jours_restants = jours_avant_voyage(coach.date_voyage if coach else None)
 
     return render_template(
         "participant/dashboard.html",
@@ -42,6 +46,8 @@ def dashboard():
         prochain_rdv=prochain_rdv,
         coach=coach,
         svg_jauge=svg_jauge,
+        serie_a_jour=serie_a_jour,
+        jours_restants=jours_restants,
     )
 
 

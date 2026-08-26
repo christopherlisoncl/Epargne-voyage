@@ -26,6 +26,7 @@ class Coach(db.Model):
     email = db.Column(db.String(255), nullable=True)
     telephone = db.Column(db.String(50), nullable=True)
     lien_rdv = db.Column(db.String(500), nullable=True)
+    date_voyage = db.Column(db.Date, nullable=True)
 
     def set_code(self, code: str):
         self.code_visible = code
@@ -42,6 +43,7 @@ class Participant(db.Model):
     nom = db.Column(db.String(120), nullable=False)
     code_hash = db.Column(db.String(255), nullable=False)
     code_visible = db.Column(db.String(6), nullable=False)
+    email = db.Column(db.String(255), nullable=True)
 
     objectif_total = db.Column(db.Float, nullable=False, default=2000.0)
     date_debut = db.Column(db.Date, nullable=False)

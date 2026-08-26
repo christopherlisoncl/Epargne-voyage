@@ -333,6 +333,21 @@ table.suivi input[type="number"] {
   display: inline-block;
 }
 
+.bandeau-motivation {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.bandeau-motivation span {
+  background: var(--teal-clair);
+  color: var(--teal);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
 .legende-graphique {
   display: flex;
   gap: 20px;

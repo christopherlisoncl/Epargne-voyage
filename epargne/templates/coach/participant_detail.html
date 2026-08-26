@@ -43,7 +43,12 @@
         <label for="nom">Nom</label>
         <input type="text" id="nom" name="nom" value="{{ participant.nom }}">
       </div>
-      <button type="submit" class="bouton secondaire petit">Renommer</button>
+      <div class="champ">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ participant.email or '' }}" placeholder="toi@exemple.com">
+        <p class="muted" style="margin-top:6px; margin-bottom:0;">Permet à {{ participant.nom }} de récupérer son code via "Code oublié ?".</p>
+      </div>
+      <button type="submit" class="bouton secondaire petit">Enregistrer</button>
     </form>
 
     <p class="muted" style="margin-top:20px;">Code personnel de {{ participant.nom }} :</p>

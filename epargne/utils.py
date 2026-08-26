@@ -123,3 +123,29 @@ def prochain_et_dernier_rdv(participant: Participant, aujourdhui: date = None):
     dernier = passes[-1] if passes else None
     prochain = futurs[0] if futurs else None
     return dernier, prochain
+
+
+def calculer_serie_a_jour(lignes, aujourdhui: date = None) -> int:
+    """Nombre de mois consécutifs (jusqu'au mois courant inclus) où le cumul réalisé
+    a couvert le cumul prévu — pour le badge de régularité."""
+    aujourdhui = aujourdhui or date.today()
+    mois_courant = premier_jour_mois(aujourdhui)
+    lignes_passees = [l for l in lignes if l["mois"] <= mois_courant]
+
+    serie = 0
+    for ligne in reversed(lignes_passees):
+        if ligne["ecart"] >= 0:
+            serie += 1
+        else:
+            break
+    return serie
+
+
+def jours_avant_voyage(date_voyage: date, aujourdhui: date = None):
+    """Nombre de jours restants avant le voyage, ou None si pas de date définie
+    ou si le voyage est déjà passé."""
+    if not date_voyage:
+        return None
+    aujourdhui = aujourdhui or date.today()
+    delta = (date_voyage - aujourdhui).days
+    return delta if delta >= 0 else None

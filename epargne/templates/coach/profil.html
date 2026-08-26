@@ -28,6 +28,13 @@
         Lien Google Calendar, Calendly ou autre — affiché comme bouton "Réserver un créneau" aux participants.
       </p>
     </div>
+    <div class="champ">
+      <label for="date_voyage">Date du voyage</label>
+      <input type="date" id="date_voyage" name="date_voyage" value="{{ coach.date_voyage.isoformat() if coach.date_voyage else '' }}">
+      <p class="muted" style="margin-top:6px; margin-bottom:0;">
+        Affiche un compte à rebours ("Plus que X jours !") sur l'espace de chaque participant.
+      </p>
+    </div>
     <button type="submit" class="bouton" style="width:100%;">Enregistrer</button>
   </form>
 </div>

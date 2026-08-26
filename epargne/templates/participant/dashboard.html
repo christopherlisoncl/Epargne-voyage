@@ -6,6 +6,17 @@
   <h1>Salut {{ participant.nom }} 👋</h1>
 </div>
 
+{% if jours_restants is not none or serie_a_jour >= 2 %}
+<div class="bandeau-motivation">
+  {% if jours_restants is not none %}
+    <span>✈️ Plus que <strong>{{ jours_restants }}</strong> jour{{ 's' if jours_restants != 1 else '' }} avant le voyage !</span>
+  {% endif %}
+  {% if serie_a_jour >= 2 %}
+    <span>🔥 <strong>{{ serie_a_jour }}</strong> mois d'affilée à jour !</span>
+  {% endif %}
+</div>
+{% endif %}
+
 <div class="carte">
   <div class="flex-entre" style="margin-bottom:14px;">
     <h2 class="mb-0">Objectif : {{ participant.objectif_total | euros }}</h2>

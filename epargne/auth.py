@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from .extensions import db
 from .models import Participant, Coach
 from .utils import generer_code_unique
-from .email_utils import envoyer_email_bienvenue
+from .email_utils import envoyer_email_bienvenue, envoyer_email_code_oublie
 from config import Config
 
 auth_bp = Blueprint("auth", __name__)
@@ -78,6 +78,7 @@ def inscription():
 
         participant = Participant(
             nom=nom,
+            email=email or None,
             objectif_total=Config.OBJECTIF_DEFAUT,
             date_debut=Config.DATE_DEBUT_DEFAUT,
             nb_mois=Config.NB_MOIS_DEFAUT,
@@ -103,6 +104,29 @@ def inscription():
         )
 
     return render_template("inscription.html")
+
+
+@auth_bp.route("/code-oublie", methods=["GET", "POST"])
+def code_oublie():
+    participants = Participant.query.order_by(Participant.nom).all()
+
+    if request.method == "POST":
+        participant_id = request.form.get("participant_id", type=int)
+        participant = Participant.query.get(participant_id) if participant_id else None
+
+        if participant and participant.email:
+            url_site = url_for("auth.login", _external=True)
+            envoyer_email_code_oublie(current_app, participant.email, participant.nom, participant.code_visible, url_site)
+
+        # Message volontairement générique, qu'un email soit enregistré ou non
+        flash(
+            "Si un email est associé à ce compte, ton code vient de t'être envoyé. "
+            "Sinon, contacte ton coach directement.",
+            "success",
+        )
+        return redirect(url_for("auth.login"))
+
+    return render_template("code_oublie.html", participants=participants)
 
 
 @auth_bp.route("/logout")

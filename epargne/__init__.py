@@ -52,26 +52,38 @@ def register_cli(app):
         """Ajoute les colonnes manquantes aux tables existantes, sans perte de données."""
         from sqlalchemy import inspect, text
 
-        with app.app_context():
-            inspector = inspect(db.engine)
-            existing_cols = {c["name"] for c in inspector.get_columns("coach")}
-            colonnes_attendues = {
+        colonnes_par_table = {
+            "coach": {
                 "email": "VARCHAR(255)",
                 "telephone": "VARCHAR(50)",
                 "lien_rdv": "VARCHAR(500)",
-            }
-            a_ajouter = {
-                nom: type_sql
-                for nom, type_sql in colonnes_attendues.items()
-                if nom not in existing_cols
-            }
-            if not a_ajouter:
+                "date_voyage": "DATE",
+            },
+            "participant": {
+                "email": "VARCHAR(255)",
+            },
+        }
+
+        with app.app_context():
+            inspector = inspect(db.engine)
+            total_ajoutees = 0
+            for table, colonnes_attendues in colonnes_par_table.items():
+                existing_cols = {c["name"] for c in inspector.get_columns(table)}
+                a_ajouter = {
+                    nom: type_sql
+                    for nom, type_sql in colonnes_attendues.items()
+                    if nom not in existing_cols
+                }
+                if not a_ajouter:
+                    continue
+                with db.engine.begin() as conn:
+                    for nom, type_sql in a_ajouter.items():
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {nom} {type_sql}"))
+                click.echo(f"{table} : {len(a_ajouter)} colonne(s) ajoutée(s) : {', '.join(a_ajouter)}")
+                total_ajoutees += len(a_ajouter)
+
+            if not total_ajoutees:
                 click.echo("Rien à migrer, la base est déjà à jour.")
-                return
-            with db.engine.begin() as conn:
-                for nom, type_sql in a_ajouter.items():
-                    conn.execute(text(f"ALTER TABLE coach ADD COLUMN {nom} {type_sql}"))
-            click.echo(f"{len(a_ajouter)} colonne(s) ajoutée(s) : {', '.join(a_ajouter)}")
 
 
 def register_template_filters(app):

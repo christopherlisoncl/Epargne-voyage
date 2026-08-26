@@ -28,6 +28,14 @@ def profil():
         coach.email = request.form.get("email", "").strip()
         coach.telephone = request.form.get("telephone", "").strip()
         coach.lien_rdv = request.form.get("lien_rdv", "").strip()
+        date_voyage_str = request.form.get("date_voyage", "").strip()
+        try:
+            coach.date_voyage = (
+                datetime.strptime(date_voyage_str, "%Y-%m-%d").date() if date_voyage_str else None
+            )
+        except ValueError:
+            flash("Date de voyage invalide.", "error")
+            return redirect(url_for("coach.profil"))
         db.session.commit()
         flash("Ton profil a été mis à jour.", "success")
         return redirect(url_for("coach.profil"))
@@ -247,10 +255,12 @@ def supprimer_rdv(participant_id, rdv_id):
 def renommer_participant(participant_id):
     participant = Participant.query.get_or_404(participant_id)
     nouveau_nom = request.form.get("nom", "").strip()
+    email = request.form.get("email", "").strip()
     if nouveau_nom:
         participant.nom = nouveau_nom
+        participant.email = email or None
         db.session.commit()
-        flash("Nom mis à jour.", "success")
+        flash("Fiche mise à jour.", "success")
     else:
         flash("Le nom ne peut pas être vide.", "error")
     return redirect(url_for("coach.detail", participant_id=participant.id))
@@ -283,6 +293,7 @@ def regenerer_code(participant_id):
 def nouveau_participant():
     if request.method == "POST":
         nom = request.form.get("nom", "").strip()
+        email = request.form.get("email", "").strip()
         objectif = request.form.get("objectif_total", "").strip().replace(",", ".")
         date_debut_str = request.form.get("date_debut", "").strip()
 
@@ -306,6 +317,7 @@ def nouveau_participant():
 
         participant = Participant(
             nom=nom,
+            email=email or None,
             objectif_total=objectif_total,
             date_debut=date_debut,
             nb_mois=Config.NB_MOIS_DEFAUT,

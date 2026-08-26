@@ -12,6 +12,13 @@
       <input type="text" id="nom" name="nom" required autofocus>
     </div>
     <div class="champ">
+      <label for="email">Email (optionnel)</label>
+      <input type="email" id="email" name="email" placeholder="toi@exemple.com">
+      <p class="muted" style="margin-top:6px; margin-bottom:0;">
+        Permet au participant de récupérer son code depuis "Code oublié ?".
+      </p>
+    </div>
+    <div class="champ">
       <label for="objectif_total">Objectif d'épargne (€)</label>
       <input type="number" id="objectif_total" name="objectif_total" min="1" step="1"
              value="{{ objectif_defaut | int }}">

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titre %}Code oublié — Cagnotte Voyage{% endblock %}
+{% block entete %}{% endblock %}
+{% block contenu %}
+<div class="page-login">
+  <div class="bloc-login">
+    <div class="titre-app">
+      <span class="emoji">🔑</span>
+      <h1>Code oublié</h1>
+      <p>On te renvoie ton code par email.</p>
+    </div>
+
+    <div class="carte">
+      <form method="post">
+        <div class="champ">
+          <label for="participant_id">Ton nom</label>
+          <select id="participant_id" name="participant_id" required>
+            <option value="" disabled selected>Choisis ton nom…</option>
+            {% for p in participants %}
+              <option value="{{ p.id }}">{{ p.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="bouton" style="width:100%;">Recevoir mon code par email</button>
+      </form>
+    </div>
+
+    <div class="lien-coach">
+      <a href="{{ url_for('auth.login') }}">← Retour à la connexion</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
