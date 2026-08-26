@@ -7,7 +7,7 @@ from .utils import (
     calculer_tableau_mensuel,
     calculer_statistiques,
     prochain_et_dernier_rdv,
-    generer_svg_progression,
+    generer_jauge_circulaire,
     STATUT_LABELS,
 )
 
@@ -30,7 +30,7 @@ def dashboard():
     stats = calculer_statistiques(participant)
     dernier_rdv, prochain_rdv = prochain_et_dernier_rdv(participant)
     coach = Coach.query.first()
-    svg_progression = generer_svg_progression(lignes, participant.objectif_total)
+    svg_jauge = generer_jauge_circulaire(stats["pourcentage"], stats["statut"])
 
     return render_template(
         "participant/dashboard.html",
@@ -41,7 +41,7 @@ def dashboard():
         dernier_rdv=dernier_rdv,
         prochain_rdv=prochain_rdv,
         coach=coach,
-        svg_progression=svg_progression,
+        svg_jauge=svg_jauge,
     )
 
 

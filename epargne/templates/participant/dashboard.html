@@ -12,12 +12,11 @@
     <span class="badge {{ stats.statut }}">{{ statut_label }}</span>
   </div>
   <div class="bloc-progression">
+    <div class="anneau-progression">
+      {{ svg_jauge | safe }}
+    </div>
     <div class="progression-details">
-      <div class="pourcentage">{{ stats.pourcentage }}%</div>
-      <div class="barre-progression">
-        <div class="remplissage" style="width: {{ stats.pourcentage }}%;"></div>
-      </div>
-      <p class="muted" style="margin-bottom:0; margin-top:10px;">
+      <p class="muted" style="margin-bottom:0;">
         {{ stats.cumul_realise_total | euros }} épargnés sur {{ participant.objectif_total | euros }}
         {% if stats.ecart >= 0 %}
           — tu as {{ stats.ecart | euros }} d'avance sur ton plan, continue comme ça !
@@ -28,17 +27,6 @@
     </div>
   </div>
 </div>
-
-{% if svg_progression %}
-<div class="carte">
-  <h2>Ma progression dans le temps</h2>
-  {{ svg_progression | safe }}
-  <div class="legende-graphique">
-    <span><span class="pastille pastille-realise"></span> Épargne réalisée</span>
-    <span><span class="pastille pastille-prevu"></span> Épargne prévue</span>
-  </div>
-</div>
-{% endif %}
 
 <div class="grille-2col">
   <div class="carte">

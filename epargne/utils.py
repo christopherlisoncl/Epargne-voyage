@@ -89,49 +89,29 @@ STATUT_LABELS = {
 }
 
 
-def generer_svg_progression(lignes, objectif_total, largeur=600, hauteur=220):
-    """Génère un petit graphique SVG (cumul prévu vs réalisé) à partir des lignes
-    calculées par calculer_tableau_mensuel."""
-    if not lignes:
-        return ""
+COULEURS_STATUT = {
+    "a_jour": "#6a9c78",
+    "a_surveiller": "#d8952c",
+    "en_retard": "#c4553e",
+}
 
-    marge_g, marge_d, marge_h, marge_b = 36, 12, 16, 30
-    n = len(lignes)
-    max_val = max(
-        [objectif_total] + [l["cumul_prevu"] for l in lignes] + [l["cumul_realise"] for l in lignes]
-    ) or 1
 
-    def pos_x(i):
-        if n == 1:
-            return marge_g
-        return marge_g + i * (largeur - marge_g - marge_d) / (n - 1)
+def generer_jauge_circulaire(pourcentage, statut=None, taille=200):
+    """Génère une jauge circulaire SVG (anneau qui se remplit selon le pourcentage)."""
+    pourcentage = max(0.0, min(100.0, pourcentage))
+    couleur = COULEURS_STATUT.get(statut, "#e07a5f")
+    rayon = taille / 2 - 18
+    centre = taille / 2
+    circonference = 2 * 3.14159265 * rayon
+    decalage = circonference * (1 - pourcentage / 100)
 
-    def pos_y(val):
-        return hauteur - marge_b - (val / max_val) * (hauteur - marge_h - marge_b)
-
-    pts_prevu = " ".join(f"{pos_x(i):.1f},{pos_y(l['cumul_prevu']):.1f}" for i, l in enumerate(lignes))
-    pts_realise = " ".join(f"{pos_x(i):.1f},{pos_y(l['cumul_realise']):.1f}" for i, l in enumerate(lignes))
-
-    # Étiquettes de mois (une sur deux si trop nombreuses, pour ne pas surcharger)
-    pas_etiquette = 2 if n > 8 else 1
-    etiquettes = ""
-    noms_mois = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"]
-    for i, l in enumerate(lignes):
-        if i % pas_etiquette == 0:
-            etiquettes += (
-                f'<text x="{pos_x(i):.1f}" y="{hauteur - 8}" font-size="10" fill="#83766a" '
-                f'text-anchor="middle">{noms_mois[l["mois"].month - 1]}</text>'
-            )
-
-    dernier_point_x = pos_x(n - 1)
-    dernier_point_y = pos_y(lignes[-1]["cumul_realise"])
-
-    return f'''<svg viewBox="0 0 {largeur} {hauteur}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
-  <line x1="{marge_g}" y1="{hauteur - marge_b}" x2="{largeur - marge_d}" y2="{hauteur - marge_b}" stroke="#e6dccb" stroke-width="1"/>
-  <polyline points="{pts_prevu}" fill="none" stroke="#83766a" stroke-width="2" stroke-dasharray="5,5" opacity="0.7"/>
-  <polyline points="{pts_realise}" fill="none" stroke="#e07a5f" stroke-width="3"/>
-  <circle cx="{dernier_point_x:.1f}" cy="{dernier_point_y:.1f}" r="4.5" fill="#e07a5f"/>
-  {etiquettes}
+    return f'''<svg viewBox="0 0 {taille} {taille}" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:220px; height:auto; display:block; margin:0 auto;">
+  <circle cx="{centre}" cy="{centre}" r="{rayon}" fill="none" stroke="#f3e4d0" stroke-width="16"/>
+  <circle cx="{centre}" cy="{centre}" r="{rayon}" fill="none" stroke="{couleur}" stroke-width="16"
+          stroke-linecap="round" stroke-dasharray="{circonference:.1f}" stroke-dashoffset="{decalage:.1f}"
+          transform="rotate(-90 {centre} {centre})" style="transition: stroke-dashoffset 0.4s ease;"/>
+  <text x="{centre}" y="{centre - 4}" text-anchor="middle" font-size="34" font-weight="800" fill="#3a3128" font-family="inherit">{pourcentage:.0f}%</text>
+  <text x="{centre}" y="{centre + 20}" text-anchor="middle" font-size="12" fill="#83766a" font-family="inherit">épargné</text>
 </svg>'''
 
 
